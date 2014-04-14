@@ -11,8 +11,8 @@ int priority;
 int client_qid;
 
 struct send{
-  int rand;
   long mtype;
+  int rand;
   int backtrace_gid;
 };
   
@@ -30,11 +30,13 @@ int main(int argc, char** argv) {
   // tworzenie kolejki
   
   client_qid = msgget(getpid(), IPC_CREAT|0600);
-  if(client_qid != 0)
+  if(client_qid == -1)
   {
    printf("Client: Queue creation Error\n");
    return(-1);
   }
+  
+  printf("Client: QID = %d\n",client_qid);
   
  struct send * msg = malloc(sizeof(struct send));
  msg->rand = limit;
@@ -43,10 +45,14 @@ int main(int argc, char** argv) {
  
  //Wysylanie
  
- if(msgsnd(server_qid, msg, sizeof(struct send) == -1)
+ if(msgsnd(server_qid, msg, sizeof(struct send),0) == -1)
    {
     printf("Client: Sending msg error\n");
     return(-1);
+   }
+   else
+   {
+    printf("Client: msg send\n"); 
    }
  
  free(msg);
@@ -55,7 +61,7 @@ int main(int argc, char** argv) {
  
  struct send * msg_get = malloc(sizeof(struct send));
  
- if(msgrcv(server_qid,msg_get,sizeof(struct send),-5,0) == -1)
+ if(msgrcv(client_qid,msg_get,sizeof(struct send),-5,0) == -1)
  {
   printf("Client: receiving msg error\n"); 
  }
@@ -75,7 +81,7 @@ int main(int argc, char** argv) {
  }
  else
  {
-   printf("Client: Server's Queue termination complited");
+   printf("Client: Server's Queue termination complited\n");
  }
  
  if(msgctl(client_qid,IPC_RMID,NULL) == -1)
@@ -85,7 +91,7 @@ int main(int argc, char** argv) {
  }
  else
  {
-   printf("Client: Queue termination complited");
+   printf("Client: Queue termination complited\n");
  }
  
  return(0);
