@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
   printf("char in files : %d\n",chars_in_file );
   content = (char*)malloc(sizeof(char) * chars_in_file + 1);
   read(file,content,chars_in_file);
- // close(file);
+  close(file);
   
   chars_for_proc = (int*)malloc(sizeof(int) * proc_num);
   string_for_proc = malloc(sizeof(char*)*proc_num);
@@ -89,6 +89,7 @@ int k=0;
 for(i = 0; i<proc_num; i=i+1)
 {
   string_for_proc[i] = malloc(sizeof(char*)*chars_for_proc[i]);
+  string_for_proc[i] = "";
   for(j=0; j<chars_for_proc[i];j++)
   {
    string_for_proc[i] = string_for_proc[i] + content[k];
@@ -99,6 +100,8 @@ for(i = 0; i<proc_num; i=i+1)
   {
       exit(-1);
   }
+ 
+  printf("string for proc %d :\n %s\n",i,string_for_proc[i]);
 }
 
   //threads = (pthread_t*)malloc(sizeof(pthread_t) * threads_num);
@@ -131,7 +134,7 @@ for(i = 0; i<proc_num; i=i+1)
      }
      else if(pid > 0)//rodzic
      {
-       if(write(sockets[i][1], string_for_proc[i], chars_for_proc[i]) < 0)
+       if(write(sockets[i][0], string_for_proc[i], chars_for_proc[i]) < 0)
        {
 	  printf("Parent: send error\n");
        }
@@ -145,11 +148,11 @@ for(i = 0; i<proc_num; i=i+1)
   
   for(i=0; i<proc_num; i=i+1)
   {
-    if(read(sockets[i],tmp_value,sizeof(int),0)<0)
+    if(read(sockets[i][1],tmp_value,sizeof(int),0)<0)
     {
       printf("Parent: receve error\n"); 
     }
-   chars_found = chars_found+tmp_value;
+   chars_found = chars_found+*tmp_value;
    close(sockets[i][1]);
    close(sockets[i][0]);
   }
