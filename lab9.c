@@ -73,6 +73,8 @@ int main(int argc, char** argv) {
   string_for_proc = malloc(sizeof(char*)*proc_num);
   chars_in_file_tmp = chars_in_file;
   
+  printf("content: %s\n",content);
+  
  int cThread = 0; 
   
   while(chars_in_file_tmp > 0)
@@ -88,13 +90,18 @@ int k=0;
 
 for(i = 0; i<proc_num; i=i+1)
 {
-  string_for_proc[i] = malloc(sizeof(char*)*chars_for_proc[i]);
+  string_for_proc[i] = malloc(sizeof(char)*chars_for_proc[i]+1);
   string_for_proc[i] = "";
+
+  char* tmp = malloc(sizeof(char)*chars_for_proc[i]);
+  
   for(j=0; j<chars_for_proc[i];j++)
   {
-   string_for_proc[i] = string_for_proc[i] + content[k];
+   //string_for_proc[i] += content[k] ;
+   strcat(tmp,&content[k]);
    k=k+1;
   }
+  string_for_proc[i] = tmp;
   sockets[i] = malloc(sizeof(int)*2);
   if(socketpair(AF_UNIX, SOCK_STREAM, 0, sockets[i]) < 0)
   {
@@ -162,3 +169,4 @@ for(i = 0; i<proc_num; i=i+1)
   return(0);
   
 }
+ 
