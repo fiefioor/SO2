@@ -91,7 +91,7 @@ for(i = 0; i<proc_num; i=i+1)
   string_for_proc[i] = malloc(sizeof(char*)*chars_for_proc[i]);
   for(j=0; j<chars_for_proc[i];j++)
   {
-   string_for_proc[i] = content[k];
+   string_for_proc[i] = string_for_proc[i] + content[k];
    k=k+1;
   }
   sockets[i] = malloc(sizeof(int)*2);
@@ -127,11 +127,11 @@ for(i = 0; i<proc_num; i=i+1)
      }
      else if(pid == -1)
      {
-       printf("creation process error\n");
+       printf("process creation error\n");
      }
-     else //rodzic
+     else if(pid > 0)//rodzic
      {
-       if(write(sockets[i][1], string_for_proc[i],chars_for_proc[i]) < 0)
+       if(write(sockets[i][1], string_for_proc[i], chars_for_proc[i]) < 0)
        {
 	  printf("Parent: send error\n");
        }
